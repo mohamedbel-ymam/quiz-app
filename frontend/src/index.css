@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+:root {
+  --card: 0 0% 100%;
+  --muted: 210 40% 96%;
+}

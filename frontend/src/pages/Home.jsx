@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import T from '../components/T'
 
 export default function Home(){
   const [name, setName] = useState('')
@@ -36,7 +37,7 @@ export default function Home(){
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Start Quiz (15 min)</h2>
+        <h2 className="text-2xl font-semibold"><T>Start Quiz (15 min)</T></h2>
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <input
             className="w-full border rounded-lg px-3 py-2"
@@ -51,7 +52,7 @@ export default function Home(){
             onChange={e=>setPhone(e.target.value)}
           />
           <button onClick={start} className="w-full bg-black text-white rounded-lg py-2">
-            Start
+            <T>Start</T>
           </button>
         </div>
       </div>
@@ -59,9 +60,9 @@ export default function Home(){
       <div className="bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-8">
         <h3 className="text-xl font-semibold mb-3">Rules</h3>
         <ul className="list-disc pl-5 space-y-2 text-gray-700">
-          <li>Authorized students only (by phone)</li>
-          <li>15 min total, auto-next per question</li>
-          <li>Results recorded for admin</li>
+          <li><T>Authorized students only (by phone)</T></li>
+          <li><T>15 min total, auto-next per question</T></li>
+          <li><T>Results recorded for admin</T></li>
         </ul>
       </div>
     </div>

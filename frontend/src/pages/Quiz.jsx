@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import T from '../components/T'
 
 const QUIZ_DURATION = 15 * 60 // seconds
 
@@ -8,153 +9,140 @@ export default function Quiz(){
   const nav = useNavigate()
   const name  = sessionStorage.getItem('student_name') || ''
   const phone = sessionStorage.getItem('student_phone') || ''
+  const degree = sessionStorage.getItem('student_degree') || ''
   const bundle = JSON.parse(sessionStorage.getItem('quiz_bundle') || '[]')
 
   const [questions, setQuestions] = useState(bundle)
   const [idx, setIdx] = useState(0)
-  const [answers, setAnswers] = useState({})       // qid -> answer_id
+  const [answers, setAnswers] = useState({})       // qid -> answer_id (undefined means unanswered)
   const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION)
-  const [qTimeLeft, setQTimeLeft] = useState(0)
-  const [timeSpent, setTimeSpent] = useState({})   // qid -> seconds
-  const perQ = useRef(0)
-  const degree = sessionStorage.getItem('student_degree') || ''
 
+  const ticking = useRef(false)
 
-  const currentQ = questions[idx]
-
-  useEffect(()=>{
-    // ⬅️ was checking email; now we require name + phone + questions
-    if(!name || !phone || questions.length === 0) return nav('/')
-    const per = Math.max(5, Math.floor(QUIZ_DURATION / Math.max(questions.length,1)))
-    perQ.current = per
-    setQTimeLeft(per)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!Array.isArray(bundle) || bundle.length === 0) {
+      // if no bundle (refresh, backdoor), send home
+      nav('/', { replace: true })
+      return
+    }
+    setQuestions(bundle)
   }, [])
 
-  // global timer
-  useEffect(()=>{
-    const t = setInterval(()=> setTimeLeft(t => {
-      if (t <= 1){ clearInterval(t); submit(true); return 0 }
-      return t - 1
-    }), 1000)
-    return ()=> clearInterval(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // per-question timer
-  useEffect(()=>{
-    if (!currentQ) return
-    const qid = currentQ.id
-    const t = setInterval(()=> {
-      setQTimeLeft(prev => {
-        if (prev <= 1){
+  // Global timer
+  useEffect(() => {
+    if (ticking.current) return
+    ticking.current = true
+    const t = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
           clearInterval(t)
-          addSpent(qid, 1)
-          goNext()
+          handleSubmit() // global timeout -> submit whatever we have
           return 0
         }
-        addSpent(qid, 1)
         return prev - 1
       })
     }, 1000)
-    return ()=> clearInterval(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, currentQ?.id])
+    return () => clearInterval(t)
+  }, [])
 
-  const addSpent = (qid, sec=1)=>{
-    setTimeSpent(prev => ({...prev, [qid]: (prev[qid] || 0) + sec}))
-  }
+  // 🚫 Prevent going back with browser back
+  useEffect(() => {
+    const block = () => {
+      history.pushState(null, document.title, window.location.href)
+    }
+    history.pushState(null, document.title, window.location.href)
+    window.addEventListener('popstate', block)
+    return () => window.removeEventListener('popstate', block)
+  }, [])
 
-  const select = (qid, aid)=> setAnswers(prev => ({...prev, [qid]: aid}))
-
-  const goNext = ()=>{
+  // ⏭️ Move forward only
+  const goNext = () => {
     if (idx < questions.length - 1) {
-      setIdx(i => i + 1)
-      setQTimeLeft(perQ.current)
+      setIdx(i => i + 1) // can only increment
     } else {
-      submit()
-    }
-  }
-  const goPrev = ()=> {
-    if (idx > 0) {
-      setIdx(i => i - 1)
-      setQTimeLeft(perQ.current)
+      handleSubmit()
     }
   }
 
-  const submit = async (auto=false)=>{
-    const payload = {
-      student_name: name,
-      student_phone: phone,
-      subject: 'mixed', // compat backend
-       degree,
-      duration: QUIZ_DURATION - timeLeft,
-      answers: questions.map(q => ({
-        question_id: q.id,
-        answer_id: Number(answers[q.id] || 0),
-        time_spent: Number(timeSpent[q.id] || 0),
-      })),
-    }
-    try{
+  const choose = (qid, answerId) => {
+    setAnswers(prev => ({ ...prev, [qid]: answerId }))
+  }
+
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        student_name: name,
+        student_phone: phone,
+        degree,
+        // Optionally include a global subject label or keep per-question subject server-side
+        subject: questions[0]?.subject ?? null,
+        answers: Object.entries(answers).map(([qid, ansId]) => ({
+          question_id: Number(qid),
+          answer_id: ansId ?? null
+        })),
+        total: questions.length,        // help server compute percent reliably
+        duration: QUIZ_DURATION - timeLeft
+      }
       const { data } = await api.post('/submit', payload)
-      sessionStorage.setItem('last_result', JSON.stringify({ subject:'mixed', ...data }))
-      nav('/result')
-    }catch(e){
-      if (!auto) alert('Soumission impossible')
-      else nav('/result')
+      sessionStorage.setItem('last_result', JSON.stringify(data))
+      // clear bundle to prevent re-entry
+      sessionStorage.removeItem('quiz_bundle')
+      nav('/result', { replace: true })
+    } catch (e) {
+      if (e?.response?.status === 409) {
+        alert('You already took the quiz.')
+        nav('/', { replace: true })
+        return
+      }
+      alert('Submit failed. Please contact the admin.')
     }
   }
 
-  const pctGlobal = Math.round(((QUIZ_DURATION - timeLeft) / QUIZ_DURATION) * 100)
-  const pctQ = currentQ ? Math.round(((perQ.current - qTimeLeft) / perQ.current) * 100) : 0
-
-  if(!currentQ) return <p>Chargement…</p>
+  if (!questions.length) return null
+  const currentQ = questions[idx]
+  const answered = answers[currentQ.id] // may be undefined (empty allowed)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
-          <b>{name}</b> | {phone} | Degree: <b>{degree}</b> | Subject: <b>{currentQ.subject}</b>
+          <b>{name}</b> | {phone} | <T>Degree:</T> <b>{degree}</b> | <T>Subject:</T> <b>{currentQ.subject}</b>
         </div>
-        <div className="text-sm">Global: <b>{format(timeLeft)}</b></div>
+        <div className="text-sm"><T>Time left:</T> <b>{format(timeLeft)}</b></div>
       </div>
 
-      <div className="space-y-2">
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-2 bg-black" style={{width:`${pctGlobal}%`}}/>
+      {/* Question */}
+      <div className="bg-white rounded-2xl shadow p-6">
+        <div className="mb-4 text-lg font-medium">
+          {idx + 1}. {currentQ.text}
         </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-2 bg-gray-800" style={{width:`${pctQ}%`}}/>
-        </div>
-        <div className="text-xs text-gray-500 flex justify-between">
-          <span>Question {idx+1}/{questions.length}</span>
-          <span>Temps question: <b>{format(qTimeLeft)}</b></span>
-        </div>
-      </div>
 
-      <div className="bg-white rounded-2xl shadow p-6 space-y-4">
-        <div className="text-lg font-medium">Q{idx+1}. {currentQ.text}</div>
-        <div className="grid gap-2">
-          {currentQ.answers.map(a=>(
-            <label key={a.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
+        <div className="space-y-2">
+          {currentQ.answers.map(opt => (
+            <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                name={`q-${currentQ.id}`}
-                checked={answers[currentQ.id] === a.id}
-                onChange={()=>select(currentQ.id, a.id)}
+                name={`q_${currentQ.id}`}
+                checked={answered === opt.id}
+                onChange={() => choose(currentQ.id, opt.id)}
               />
-              <span>{a.text}</span>
+              <span>{opt.text}</span>
             </label>
           ))}
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <button onClick={goPrev} className="px-4 py-2 rounded-lg border hover:bg-gray-50" disabled={idx===0}>Précédent</button>
-          <div className="flex gap-2">
-            <button onClick={goNext} className="px-4 py-2 rounded-lg bg-black text-white">
-              {idx === questions.length - 1 ? 'Soumettre' : 'Suivant'}
-            </button>
+        {/* Controls (no Previous button!) */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-xs text-gray-500">
+            Question {idx + 1} / {questions.length}
           </div>
+          <button
+            onClick={goNext}
+            className="px-4 py-2 rounded-lg bg-black text-white"
+          >
+            {idx === questions.length - 1 ? 'Submit' : 'Next'}
+          </button>
         </div>
       </div>
     </div>

@@ -1,18 +1,24 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void {
-        // Clean duplicates first if any, or the index will fail.
-        // You can manually delete older rows where phone is the same.
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('phone', 20)->nullable()->change();
+            $table->unique('phone', 'users_phone_unique');
+        });
         Schema::table('results', function (Blueprint $table) {
-            if (!Schema::hasColumn('results','phone')) return;
+            $table->string('phone', 20)->nullable(false)->change();
             $table->unique('phone', 'results_phone_unique');
         });
     }
     public function down(): void {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropUnique('users_phone_unique');
+        });
         Schema::table('results', function (Blueprint $table) {
             $table->dropUnique('results_phone_unique');
         });

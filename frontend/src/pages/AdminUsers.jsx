@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import T from '../components/T'
 
 const DEGREES = [
   { key:'degree1', label:'Degree 1' },
@@ -72,9 +73,9 @@ export default function AdminUsers(){
           onClick={() => nav('/admin')}
           className="px-4 py-2 rounded-lg border bg-green-800 text-white hover:bg-gray-50 hover:text-black"
         >
-          ← Back to Results
+          <T>← Back to Results</T>
         </button>
-        <h2 className="text-2xl font-semibold">Admin – Manage Students</h2>
+        <h2 className="text-2xl font-semibold"><T>Admin – Manage Students</T></h2>
         <div />
       </div>
 
@@ -101,11 +102,11 @@ export default function AdminUsers(){
             {DEGREES.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
           </select>
           <button onClick={addUser} className="px-4 py-2 rounded-lg bg-black text-white">
-            Add / Update
+            <T>Add / Update</T>
           </button>
         </div>
         <p className="text-sm text-gray-500">
-          Phone must be Moroccan mobile (06/07… or +2126/7…).
+          <T>Phone must be Moroccan mobile (06/07… or +2126/7…).</T>
         </p>
       </div>
 
@@ -123,23 +124,23 @@ export default function AdminUsers(){
             value={filterDegree}
             onChange={e=>setFilterDegree(e.target.value)}
           >
-            <option value="">All degrees</option>
+            <option value=""><T>All degrees</T></option>
             {DEGREES.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
           </select>
           <button onClick={()=>{ setPage(1); load(1) }} className="px-4 py-2 rounded-lg bg-black text-white">
-            Search
+            <T>Search</T>
           </button>
         </div>
 
         <table className="w-full text-sm mt-3">
           <thead className="bg-gray-50">
             <tr>
-              <th className="text-left p-3">ID</th>
-              <th className="text-left p-3">Degree</th>
-              <th className="text-left p-3">Name</th>
-              <th className="text-left p-3">Phone</th>
-              <th className="text-left p-3">Role</th>
-              <th className="text-left p-3">Actions</th>
+              <th className="text-left p-3"><T>ID</T></th>
+              <th className="text-left p-3"><T>Degree</T></th>
+              <th className="text-left p-3"><T>Name</T></th>
+              <th className="text-left p-3"><T>Phone</T></th>
+              <th className="text-left p-3"><T>Role</T></th>
+              <th className="text-left p-3"><T>Actions</T></th>
             </tr>
           </thead>
           <tbody>
@@ -151,7 +152,7 @@ export default function AdminUsers(){
                 <td className="p-3">{u.phone}</td>
                 <td className="p-3">{u.role}</td>
                 <td className="p-3">
-                  <button onClick={()=>delUser(u.id)} className="px-3 py-2 rounded-lg border">Delete</button>
+                  <button onClick={()=>delUser(u.id)} className="px-3 py-2 rounded-lg border"><T>Delete</T></button>
                 </td>
               </tr>
             ))}
@@ -164,13 +165,13 @@ export default function AdminUsers(){
             onClick={()=>{ const np = page-1; setPage(np); load(np) }}
             className="px-3 py-2 rounded-lg border disabled:opacity-50"
           >
-            Prev
+            <T>Prev</T>
           </button>
           <button
             onClick={()=>{ const np = page+1; setPage(np); load(np) }}
             className="px-3 py-2 rounded-lg border"
           >
-            Next
+            <T>Next</T>
           </button>
         </div>
       </div>

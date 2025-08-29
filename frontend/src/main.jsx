@@ -8,6 +8,7 @@ import Result from './pages/Result.jsx'
 import Admin from './pages/Admin.jsx'
 import AdminQuestions from './pages/AdminQuestions.jsx'
 import AdminUsers from './pages/AdminUsers.jsx'
+import './i18n.js';
 import './index.css'
 
 const router = createBrowserRouter([

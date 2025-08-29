@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import T from '../components/T'
 
 export default function Admin(){
   const nav = useNavigate()
@@ -78,21 +79,20 @@ export default function Admin(){
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Admin – Results</h2>
+        <h2 className="text-2xl font-semibold"><T>Admin – Results</T></h2>
         {isAuthed && (
           <div className="flex gap-2">
             <button
               onClick={() => nav('/admin/users')}
               className="px-4 py-2 rounded-lg border hover:bg-gray-50"
             >
-              👥 Manage Students
+              <T>👥 Manage Students</T>
             </button>
             <button
               onClick={() => nav('/admin/questions')}
               className="px-4 py-2 rounded-lg bg-black text-white hover:bg-gray-800"
             >
-              ➕ Create Question
-            </button>
+              <T>➕ Create Question</T>            </button>
           </div>
         )}
       </div>
@@ -106,17 +106,17 @@ export default function Admin(){
             onChange={e=>setAdminKeyInput(e.target.value)}
           />
           {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
-          <button type="submit" className="px-4 py-2 rounded-lg bg-black text-white">Enter</button>
+          <button type="submit" className="px-4 py-2 rounded-lg bg-black text-white"><T>Enter</T></button>
         </form>
       ) : (
         <>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-green-700">Authenticated</span>
+            <span className="text-sm text-green-700"><T>Authenticated</T></span>
             <button
               onClick={logout}
               className="px-3 py-1 bg-red-600 text-white hover:bg-white hover:text-red-500 rounded-lg border"
             >
-              Logout
+              <T>Logout</T>
             </button>
           </div>
 
@@ -132,15 +132,15 @@ export default function Admin(){
               value={subject}
               onChange={e=>setSubject(e.target.value)}
             >
-              <option value="">All subjects</option>
-              <option value="math">Math</option>
-              <option value="physics">Physics</option>
-              <option value="cs">CS</option>
-              <option value="language">Language</option>
-              <option value="mixed">Mixed</option>
+              <option value=""><T>All subjects</T></option>
+              <option value="math"><T>Math</T></option>
+              <option value="physics"><T>Physics</T></option>
+              <option value="cs"><T>CS</T></option>
+              <option value="language"><T>Language</T></option>
+              <option value="mixed"><T>Mixed</T></option>
             </select>
             <button onClick={()=>{ setPage(1); load(1) }} className="px-4 py-2 rounded-lg bg-black text-white">
-              Filter
+              <T>Filter</T>
             </button>
           </div>
 
@@ -148,12 +148,12 @@ export default function Admin(){
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left p-3">Student</th>
-                  <th className="text-left p-3">Subject</th>
-                  <th className="text-left p-3">Score</th>
-                  <th className="text-left p-3">Duration</th>
-                  <th className="text-left p-3">Date</th>
-                  <th className="text-left p-3">Actions</th>
+                  <th className="text-left p-3"><T>Student</T></th>
+                  <th className="text-left p-3"><T>Subject</T></th>
+                  <th className="text-left p-3"><T>Score</T></th>
+                  <th className="text-left p-3"><T>Duration</T></th>
+                  <th className="text-left p-3"><T>Date</T></th>
+                  <th className="text-left p-3"><T>Actions</T></th>
                 </tr>
               </thead>
               <tbody>
@@ -170,7 +170,7 @@ export default function Admin(){
                       <button
                         onClick={() => deleteResult(r.id)}
                         className="px-3 py-2 rounded-lg border hover:bg-gray-50"
-                      >Delete
+                      ><T> Delete</T>
                       </button>
                     </td>
                   </tr>
@@ -185,13 +185,14 @@ export default function Admin(){
               onClick={()=>setPage(p=>p-1)}
               className="px-3 py-2 rounded-lg border disabled:opacity-50"
             >
-              Prev
+              <T>Prev</T>
             </button>
             <button
               onClick={()=>setPage(p=>p+1)}
               className="px-3 py-2 rounded-lg border"
             >
-              Next
+              <T>Next</T>
+              
             </button>
           </div>
         </>

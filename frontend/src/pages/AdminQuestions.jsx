@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import T from '../components/T'
 
 const SUBJECTS = [
   { key:'math', label:'Math' },
@@ -103,9 +104,9 @@ export default function AdminQuestions(){
           onClick={() => nav('/admin')}
           className="px-4 py-2 rounded-lg border bg-green-800 text-white hover:bg-gray-50 hover:text-black"
         >
-          ← Back to Results
+          <T>← Back to Results</T>
         </button>
-        <h2 className="text-2xl font-semibold">Admin – Create Questions</h2>
+        <h2 className="text-2xl font-semibold"><T>Admin – Create Questions</T></h2>
         <div />
       </div>
 
@@ -119,7 +120,7 @@ export default function AdminQuestions(){
             {SUBJECTS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
           <button onClick={create} className="justify-self-end px-4 py-2 rounded-lg bg-black text-white">
-            Create
+            <T>Create</T>
           </button>
         </div>
 
@@ -141,10 +142,10 @@ export default function AdminQuestions(){
                 value={a.text}
                 onChange={e=>updateAnswer(i, e.target.value)}
               />
-              <button onClick={()=>removeAnswer(i)} className="px-3 py-2 rounded-lg border">Remove</button>
+              <button onClick={()=>removeAnswer(i)} className="px-3 py-2 rounded-lg border"><T>Remove</T></button>
             </div>
           ))}
-          <button onClick={addAnswer} className="px-3 py-2 rounded-lg border">Add answer</button>
+          <button onClick={addAnswer} className="px-3 py-2 rounded-lg border"><T>Add answer</T></button>
         </div>
       </div>
 
@@ -152,27 +153,27 @@ export default function AdminQuestions(){
       <div className="bg-white rounded-2xl shadow p-6 space-y-3">
         <div className="grid md:grid-cols-5 gap-3">
           <select className="border rounded-lg px-3 py-2" value={filterDegree} onChange={e=>setFilterDegree(e.target.value)}>
-            <option value="">All degrees</option>
+            <option value=""><T>All degrees</T></option>
             {DEGREES.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
           </select>
 
           <select className="border rounded-lg px-3 py-2" value={filterSubj} onChange={e=>setFilterSubj(e.target.value)}>
-            <option value="">All subjects</option>
+            <option value=""><T>All subjects</T></option>
             {SUBJECTS.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
 
-          <button onClick={()=>load(1)} className="px-4 py-2 rounded-lg bg-black text-white">Filter</button>
+          <button onClick={()=>load(1)} className="px-4 py-2 rounded-lg bg-black text-white"><T>Filter</T></button>
         </div>
 
         <table className="w-full text-sm mt-3">
           <thead className="bg-gray-50">
             <tr>
-              <th className="text-left p-3">ID</th>
-              <th className="text-left p-3">Degree</th>
-              <th className="text-left p-3">Subject</th>
-              <th className="text-left p-3">Question</th>
-              <th className="text-left p-3">Answers</th>
-              <th className="text-left p-3">Actions</th>
+              <th className="text-left p-3"><T>ID</T></th>
+              <th className="text-left p-3"><T>Degree</T></th>
+              <th className="text-left p-3"><T>Subject</T></th>
+              <th className="text-left p-3"><T>Question</T></th>
+              <th className="text-left p-3"><T>Answers</T></th>
+              <th className="text-left p-3"><T>Actions</T></th>
             </tr>
           </thead>
           <tbody>
@@ -192,7 +193,7 @@ export default function AdminQuestions(){
                   </ul>
                 </td>
                 <td className="p-3">
-                  <button onClick={()=>del(q.id)} className="px-3 py-2 rounded-lg border">Delete</button>
+                  <button onClick={()=>del(q.id)} className="px-3 py-2 rounded-lg border"><T>Delete</T></button>
                 </td>
               </tr>
             ))}
@@ -205,13 +206,13 @@ export default function AdminQuestions(){
             onClick={()=>{ const np = page-1; setPage(np); load(np) }}
             className="px-3 py-2 rounded-lg border disabled:opacity-50"
           >
-            Prev
+            <T>Prev</T>
           </button>
           <button
             onClick={()=>{ const np = page+1; setPage(np); load(np) }}
             className="px-3 py-2 rounded-lg border"
           >
-            Next
+            <T>Next</T>
           </button>
         </div>
       </div>

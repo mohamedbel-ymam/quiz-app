@@ -7,7 +7,7 @@ return [
     | Paths that should be accessible with CORS
     |--------------------------------------------------------------------------
     */
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout', 'me', 'user'],
 
     /*
     |--------------------------------------------------------------------------
@@ -21,7 +21,7 @@ return [
     | Allowed Origins
     |--------------------------------------------------------------------------
     */
-    'allowed_origins' => ['http://localhost:5173'],
+    'allowed_origins' => [env('FRONTEND_URL')],
 
     /*
     |--------------------------------------------------------------------------
@@ -49,6 +49,5 @@ return [
     | Supports Credentials
     |--------------------------------------------------------------------------
     */
-    'supports_credentials' => false,
-
+    'supports_credentials' => true,
 ];

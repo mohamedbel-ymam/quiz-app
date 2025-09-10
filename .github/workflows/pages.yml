@@ -1,4 +1,4 @@
-name: Deploy Vite app to GitHub Pages
+name: Deploy frontend (Vite) to GitHub Pages
 on:
   push:
     branches: [main]
@@ -17,18 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: quiz-app     # <-- inner folder
+        working-directory: frontend   # <-- build inside frontend/
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20              # <-- no cache lines
-      - run: npm install                # use install since there’s no lockfile yet
-      - run: npm run build -- --base=/quiz-app/
+          node-version: 20
+      - run: npm install              # use npm ci only if you commit package-lock.json
+      - run: npm run build -- --base=/quiz-app/   # repo name as base
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: quiz-app/dist           # artifact path from repo root
+          path: frontend/dist         # artifact path from repo root
 
   deploy:
     needs: build

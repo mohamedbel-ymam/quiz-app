@@ -8,22 +8,30 @@ import Result from './pages/Result.jsx'
 import Admin from './pages/Admin.jsx'
 import AdminQuestions from './pages/AdminQuestions.jsx'
 import AdminUsers from './pages/AdminUsers.jsx'
-import './i18n.js';
+import './i18n.js'
 import './index.css'
 
-const router = createBrowserRouter([
-  { path: '/', element: <App />, children: [
-    { index: true, element: <Home /> },
-    { path: 'quiz', element: <Quiz /> },
-    { path: 'result', element: <Result /> },
-    { path: 'admin', element: <Admin /> },
-    { path: 'admin/questions', element: <AdminQuestions /> },
-    { path: 'admin/users', element: <AdminUsers /> },
+// Remove trailing slash so React Router likes it
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
-  ]},
-])
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: 'quiz', element: <Quiz /> },
+        { path: 'result', element: <Result /> },
+        { path: 'admin', element: <Admin /> },
+        { path: 'admin/questions', element: <AdminQuestions /> },
+        { path: 'admin/users', element: <AdminUsers /> },
+      ],
+    },
+  ],
+  { basename }
+)
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <RouterProvider router={router} />
 )
-

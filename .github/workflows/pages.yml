@@ -22,7 +22,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm install            # <-- was npm ci
-      - run: npm run build
+      - run: npm run build -- --base=/quiz-app/
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:

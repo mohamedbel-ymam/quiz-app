@@ -11,23 +11,19 @@ import AdminUsers from './pages/AdminUsers.jsx'
 import './i18n.js'
 import './index.css'
 
-// Remove trailing slash so React Router likes it
+// Use Vite's BASE_URL and strip trailing slash
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 const router = createBrowserRouter(
   [
-    {
-      path: '/',
-      element: <App />,
-      children: [
-        { index: true, element: <Home /> },
-        { path: 'quiz', element: <Quiz /> },
-        { path: 'result', element: <Result /> },
-        { path: 'admin', element: <Admin /> },
-        { path: 'admin/questions', element: <AdminQuestions /> },
-        { path: 'admin/users', element: <AdminUsers /> },
-      ],
-    },
+    { path: '/', element: <App />, children: [
+      { index: true, element: <Home /> },
+      { path: 'quiz', element: <Quiz /> },
+      { path: 'result', element: <Result /> },
+      { path: 'admin', element: <Admin /> },
+      { path: 'admin/questions', element: <AdminQuestions /> },
+      { path: 'admin/users', element: <AdminUsers /> },
+    ]},
   ],
   { basename }
 )
